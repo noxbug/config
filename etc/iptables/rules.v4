@@ -1,0 +1,19 @@
+# flush iptables
+sudo iptables -F
+sudo iptables -t nat -F
+
+# install iptables
+sudo iptables -t nat -A PREROUTING -i tun0 -p tcp --dport 22 -j REDIRECT --to-ports 22
+sudo iptables -t nat -A PREROUTING -i tun0 -p udp --dport 53 -j REDIRECT --to-ports 53
+sudo iptables -t nat -A PREROUTING -i tun0 -p tcp --syn -j REDIRECT --to-ports 9040
+
+# check if correctly entered
+sudo iptables -t nat -L
+
+# load rules at boot
+sudo sh -c "iptables-save > /etc/iptables/rules.v4"
+
+# ore save
+sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
+# and restore at boot in rc.local
+iptables-restore < /etc/iptables.ipv4.nat
